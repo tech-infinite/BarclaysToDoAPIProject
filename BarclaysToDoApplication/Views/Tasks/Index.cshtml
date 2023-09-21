@@ -1,0 +1,27 @@
+﻿@page
+@using BarclaysToDoApplication.Views.Tasks;
+@model IndexModel
+@{
+    ViewData["Title"] = "ToDo List Application";
+}
+
+<h1>List of Tasks</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Task Name</th>
+            <th>Is Complete?</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tasks)
+        {
+            <tr>
+                <td>@item.TaskName</td>
+                <td>@(item.IsTaskComplete? "Yes" : "No")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

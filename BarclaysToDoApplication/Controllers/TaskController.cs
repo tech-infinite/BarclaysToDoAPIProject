@@ -1,11 +1,11 @@
 ﻿using BarclaysToDoApplication.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Web.Http;
+
 
 namespace BarclaysToDoApplication.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
     {
@@ -15,14 +15,14 @@ namespace BarclaysToDoApplication.Controllers
 
 
         // GET tasks from the list
-        [System.Web.Http.HttpGet]
+        [HttpGet]
         public ActionResult GetTasks()
         {
             return Ok(tasks);
         }
 
         // POST api/task
-        [System.Web.Http.HttpPost]
+        [HttpPost]
         public ActionResult AddTask(TaskItems task)
         {
             if (task == null || string.IsNullOrWhiteSpace(task.TaskName))
@@ -43,8 +43,8 @@ namespace BarclaysToDoApplication.Controllers
         }
 
         // PUT request to edit an existing task
-        [System.Web.Http.HttpPut]
-        public ActionResult EditTask(int id, TaskItems task)
+        [HttpPut]
+        public ActionResult EditTask(int taskID, TaskItems task)
         {
             if (task == null || string.IsNullOrWhiteSpace(task.TaskName))
             {
@@ -52,7 +52,7 @@ namespace BarclaysToDoApplication.Controllers
                 return BadRequest(ModelState);
             }
 
-            var existingTask = tasks.FirstOrDefault(t => t.TaskId == id);
+            var existingTask = tasks.FirstOrDefault(t => t.TaskId == taskID);
             if (existingTask == null)
             {
                 return NotFound();
@@ -63,11 +63,11 @@ namespace BarclaysToDoApplication.Controllers
             return Ok(existingTask);
         }
 
-        // DELETE 
-        [System.Web.Http.HttpDelete]
-        public ActionResult DeleteTask(int id)
+        // DELETE task by it's ID
+        [HttpDelete]
+        public ActionResult DeleteTask(int taskID)
         {
-            var taskToDelete = tasks.FirstOrDefault(t => t.TaskId == id);
+            var taskToDelete = tasks.FirstOrDefault(t => t.TaskId == taskID);
             if (taskToDelete == null)
             {
                 return NotFound();
@@ -77,7 +77,7 @@ namespace BarclaysToDoApplication.Controllers
             return Ok();
         }
 
-        // Verify deletion of completed tasks
+        // Deletion of completed tasks
         public ActionResult DeleteCompletedTasks()
         {
             tasks.RemoveAll(t => t.IsTaskComplete);
