@@ -36,7 +36,7 @@ public class TaskController : Controller
         return View(task);
     }
 
-    [HttpPost]
+    [HttpDelete]
     public IActionResult DeleteCompletedTasks()
     {
         _taskServices.DeleteCompletedTasks(); // Call the DeleteCompletedTasks method of your service
