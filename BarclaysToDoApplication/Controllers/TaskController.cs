@@ -1,89 +1,47 @@
-﻿using BarclaysToDoApplication.Models;
-using Microsoft.AspNetCore.Http;
+﻿using BarclaysToDoApplication.Interfaces;
+using BarclaysToDoApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 
 
-namespace BarclaysToDoApplication.Controllers
+public class TaskController : Controller
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TaskController : ControllerBase
+    private readonly ITaskServices _taskServices;
+
+    public TaskController(ITaskServices taskService)
     {
-        // To initalize the list to store tasks
-        private List<TaskItems> tasks = new List<TaskItems>();
-        private int nextTaskID = 1;
+        _taskServices = taskService;
+    }
 
+    // Other action methods...
 
-        // GET tasks from the list
-        [HttpGet]
-        public ActionResult GetTasks()
+    [HttpPost]
+    public IActionResult AddTask(TaskItems task)
+    {
+        if (ModelState.IsValid)
         {
-            return Ok(tasks);
+            _taskServices.AddTask(task); // Calls the AddTask method 
+            return RedirectToAction("Index");
         }
+        return View(task);
+    }
 
-        // POST api/task
-        [HttpPost]
-        public ActionResult AddTask(TaskItems task)
+    [HttpPost]
+    public IActionResult EditTask(int id, TaskItems task)
+    {
+        if (ModelState.IsValid)
         {
-            if (task == null || string.IsNullOrWhiteSpace(task.TaskName))
-            {
-                ModelState.AddModelError("TaskName", "Task Name is required.");
-                return BadRequest(ModelState);
-            }
-
-            if (tasks.Any(t => t.TaskName.Equals(task.TaskName, StringComparison.OrdinalIgnoreCase)))
-            {
-                ModelState.AddModelError("TaskName", "Task with the same name already exists.");
-                return BadRequest(ModelState);
-            }
-
-            task.TaskId = nextTaskID++;
-            tasks.Add(task);
-            return CreatedAtRoute("DefaultApi", new { id = task.TaskId }, task);
+            _taskServices.EditTask(id, task); // Calls the EditTask method of your service
+            return RedirectToAction("Index");
         }
+        return View(task);
+    }
 
-        // PUT request to edit an existing task
-        [HttpPut]
-        public ActionResult EditTask(int taskID, TaskItems task)
-        {
-            if (task == null || string.IsNullOrWhiteSpace(task.TaskName))
-            {
-                ModelState.AddModelError("TaskName", "Task Name is required.");
-                return BadRequest(ModelState);
-            }
-
-            var existingTask = tasks.FirstOrDefault(t => t.TaskId == taskID);
-            if (existingTask == null)
-            {
-                return NotFound();
-            }
-
-            existingTask.TaskName = task.TaskName;
-            existingTask.IsTaskComplete = task.IsTaskComplete;
-            return Ok(existingTask);
-        }
-
-        // DELETE task by it's ID
-        [HttpDelete]
-        public ActionResult DeleteTask(int taskID)
-        {
-            var taskToDelete = tasks.FirstOrDefault(t => t.TaskId == taskID);
-            if (taskToDelete == null)
-            {
-                return NotFound();
-            }
-
-            tasks.Remove(taskToDelete);
-            return Ok();
-        }
-
-        // Deletion of completed tasks
-        public ActionResult DeleteCompletedTasks()
-        {
-            tasks.RemoveAll(t => t.IsTaskComplete);
-            return Ok();
-        }
-
-
+    [HttpPost]
+    public IActionResult DeleteCompletedTasks()
+    {
+        _taskServices.DeleteCompletedTasks(); // Call the DeleteCompletedTasks method of your service
+        return RedirectToAction("Index");
     }
 }
+
+

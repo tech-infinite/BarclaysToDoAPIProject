@@ -21,6 +21,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// In Configure method
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
