@@ -4,7 +4,6 @@ namespace BarclaysToDoApplication.Models
 {
     public class TaskItems
     {
-
         public int TaskId { get; set; }
 
         [Required(ErrorMessage = "Task Name is required.")]
@@ -14,7 +13,5 @@ namespace BarclaysToDoApplication.Models
         [Range(1, 5, ErrorMessage = "Priority must be between 1 and 5.")]
         public int Priority { get; set; }
         public string? Status { get; set; }
-
-        public bool IsTaskComplete { get; set; }
     }
 }

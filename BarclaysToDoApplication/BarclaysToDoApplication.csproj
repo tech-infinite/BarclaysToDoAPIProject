@@ -30,4 +30,8 @@
     <None Include="Pages\Shared\_Layout.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\" />
+  </ItemGroup>
+
 </Project>

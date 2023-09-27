@@ -2,46 +2,78 @@
 using BarclaysToDoApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 
-
-public class TaskController : Controller
-{
-    private readonly ITaskServices _taskServices;
-
-    public TaskController(ITaskServices taskService)
+    [ApiController]
+    [Route("[controller]")]
+    public class TodoController : ControllerBase
     {
-        _taskServices = taskService;
-    }
+        private readonly List<TaskItems> _todoItems = new List<TaskItems>();
 
-    // Other action methods...
-
-    [HttpPost]
-    public IActionResult AddTask(TaskItems task)
-    {
-        if (ModelState.IsValid)
+        [HttpGet]
+        public IEnumerable<TaskItems> Get()
         {
-            _taskServices.AddTask(task); // Calls the AddTask method 
-            return RedirectToAction("Index");
+            return _todoItems;
         }
-        return View(task);
-    }
 
-    [HttpPost]
-    public IActionResult EditTask(int id, TaskItems task)
-    {
-        if (ModelState.IsValid)
+        [HttpPost]
+        public IActionResult Post(TaskItems item)
         {
-            _taskServices.EditTask(id, task); // Calls the EditTask method of your service
-            return RedirectToAction("Index");
+            if (item == null)
+            {
+                return BadRequest();
+            }
+
+            if (_todoItems.Any(x => x.TaskName == item.TaskName))
+            {
+                return Conflict();
+            }
+
+            _todoItems.Add(item);
+
+            return CreatedAtAction(nameof(Get), new { id = item.TaskId }, item);
         }
-        return View(task);
+
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, TaskItems item)
+        {
+            if (item == null || id != item.TaskId)
+            {
+                return BadRequest();
+            }
+
+            var existingItem = _todoItems.FirstOrDefault(x => x.TaskId == id);
+
+            if (existingItem == null)
+            {
+                return NotFound();
+            }
+
+            existingItem.TaskName = item.TaskName;
+            existingItem.Priority = item.Priority;
+            existingItem.Status = item.Status;
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var itemToRemove = _todoItems.FirstOrDefault(x => x.TaskId == id);
+
+            if (itemToRemove == null)
+            {
+                return NotFound();
+            }
+
+            if (itemToRemove.Status != "completed")
+            {
+                return BadRequest();
+            }
+
+            _todoItems.Remove(itemToRemove);
+
+            return NoContent();
+        }
     }
 
-    [HttpDelete]
-    public IActionResult DeleteCompletedTasks()
-    {
-        _taskServices.DeleteCompletedTasks(); // Call the DeleteCompletedTasks method of your service
-        return RedirectToAction("Index");
-    }
-}
 
 
